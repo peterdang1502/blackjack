@@ -1,0 +1,2 @@
+CARD_VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']
+CARD_SUITS = ['Spades', 'Clubs', 'Hearts', 'Diamonds']

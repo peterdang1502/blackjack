@@ -1,0 +1,45 @@
+import random
+from constants import CARD_VALUES, CARD_SUITS
+
+class Card:
+    def __init__(self, value, suit):
+        self.value = value
+        self.suit = suit
+
+class Game:
+    def __init__(self):
+        self.deck = random.shuffle([Card(value, suit) for value in CARD_VALUES for suit in CARD_SUITS])
+        self.players = []  #dealer at last
+        self.pot = 0
+
+    def add_player(self, player):
+        self.players.append(player)
+
+    def add_players(self, players):
+        self.players.extend(players)
+
+    def total_pot(self):
+        return self.pot
+    
+    def increase_pot(self, bet):
+        self.pot += bet
+        return self.pot
+    
+    def deal(self, players):
+        for p in players:
+            p.hand.append(self.deck.pop(0))
+
+    def blackjack_check(self):
+        blackjack_players = []
+        for p in self.players[:-1]:
+            if p.blackjack():
+                blackjack_players.append(p)
+        if self.players[-1].blackjack():
+            for p in self.players:
+                if p in blackjack_players:
+                    print("PUSH")
+                else:
+                    print("LOST")
+        else:
+            for p in blackjack_players:
+                print("WON")
