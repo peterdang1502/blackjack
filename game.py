@@ -8,7 +8,8 @@ class Card:
 
 class Game:
     def __init__(self):
-        self.deck = random.shuffle([Card(value, suit) for value in CARD_VALUES for suit in CARD_SUITS])
+        self.deck = [Card(value, suit) for value in CARD_VALUES for suit in CARD_SUITS]
+        random.shuffle(self.deck)
         self.players = []  #dealer at last
         self.pot = 0
 
@@ -25,9 +26,10 @@ class Game:
         self.pot += bet
         return self.pot
     
-    def deal(self, players):
-        for p in players:
-            p.hand.append(self.deck.pop(0))
+    def deal(self):
+        for i in range(2):
+            for p in self.players:
+                p.hand.append(self.deck.pop(0))
 
     def blackjack_check(self):
         blackjack_players = []

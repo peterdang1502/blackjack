@@ -2,7 +2,7 @@ from player import Player
 
 class Dealer(Player):
     def __init__(self):
-        super.__init__("Dealer")
+        Player.__init__(self, "Dealer")
 
     def show_hand_at_deal(self):
         print(self.name + " hands: ")
