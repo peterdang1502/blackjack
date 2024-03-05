@@ -1,35 +1,18 @@
 from constants import CARD_VALUES, CARD_SUITS
+from hand import Hand
+import re
 
 class Player:
-    def __init__(self, name="Player"):
+    def __init__(self, name="Player", balance=100):
         self.name = name
-        self.hand = []
-        self.hand_value = 0
-        self.ace_flag = False
+        self.hands = []
+        self.balance = balance
 
-    def compute_hand_value(self):
-        for card in self.hand:
-            if card.value in CARD_VALUES[0:9]:
-                self.hand_value += int(card.value)
-            elif card.value in CARD_VALUES[9:12]:
-                self.hand_value += 10
-            else:
-                if self.ace_flag:
-                    self.hand_value = 2
-                else:
-                    self.hand_value += 1
-                self.ace_flag = True
+    def new_hand(self, hand):
+        self.hands.append(hand)
 
-    def blackjack(self):
-        return self.ace_flag and self.hand_value + 10 == 21
-    
-    def show_hand(self):
-        self.compute_hand_value()
+    def show_hands(self):
         print(self.name + " hands: ")
-        for card in self.hand:
-            print(card.value + " of " + card.suit + " ")
-        if self.ace_flag and self.hand_value != 2:
-            print("Hand value: " + str(self.hand_value) + " or " + str(self.hand_value + 10))
-        else:
-            print("Hand value: " + str(self.hand_value))
-        print("\n")
+        for hand in self.hands:
+            print("Hand 1:")
+            hand.show_hand()
