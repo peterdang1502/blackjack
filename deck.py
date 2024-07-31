@@ -1,10 +1,10 @@
 import random
-card_numbers = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
-suits = ["C", "D", "H", "S"]
+from constants import *
+from card import Card
 
 class Deck:
     def __init__(self):
-        self.deck = [(a + b) for a in card_numbers for b in suits] * 6
+        self.deck = [Card(a, b) for a in CARD_NUMBERS for b in CARD_SUITS] * 6
         random.shuffle(self.deck)
 
     def draw_card(self):
