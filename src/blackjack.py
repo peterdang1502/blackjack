@@ -1,6 +1,6 @@
-from .deck import Deck
-from .player import Player
-from .dealer import Dealer
+from deck import Deck
+from player import Player
+from dealer import Dealer
 
 class Game:
     def __init__(self):

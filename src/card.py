@@ -1,4 +1,4 @@
-from .constants import *
+from constants import *
 
 class Card:
     def __init__(self, number, suit):
