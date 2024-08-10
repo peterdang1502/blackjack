@@ -4,7 +4,7 @@ from card import Card
 
 class Deck:
     def __init__(self):
-        self.deck = [Card(a, b) for a in CARD_NUMBERS for b in CARD_SUITS] * 6
+        self.deck = [Card(a, b) for a in CARD_RANKS for b in CARD_SUITS] * NUM_OF_DECKS
         random.shuffle(self.deck)
 
     def draw_card(self):
