@@ -2,4 +2,4 @@ from player import Player
 
 class Dealer(Player):
     def print_cards(self):
-        print(['  '] + self.hand[1:])
+        self.hands[0].print_dealer_cards()

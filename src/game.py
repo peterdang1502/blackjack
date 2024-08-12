@@ -6,8 +6,8 @@ from constants import *
 class Game:
     def __init__(self):
         self.deck = Deck()
-        self.player = Player()
         self.dealer = Dealer()
+        self.player = Player()
 
     def deal_cards(self):
         for i in range(2):
@@ -32,3 +32,7 @@ class Game:
             return WON
         else:
             return CONTINUE
+        
+    def print_cards(self):
+        self.dealer.print_cards()
+        self.player.print_cards()

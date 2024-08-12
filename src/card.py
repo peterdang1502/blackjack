@@ -11,7 +11,7 @@ class Card:
         if self.rank in CARD_RANKS[:8]:
             self.value = int(self.rank)
         elif self.rank == CARD_RANKS[-1]:
-            self.value = 1
+            self.value = 11
         else:
             self.value = 10
 

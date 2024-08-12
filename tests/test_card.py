@@ -21,7 +21,7 @@ class TestCard(unittest.TestCase):
     def test_calculate_value_ace(self):
         """Test to calculate card value of Ace"""
         card = Card(self.ace, self.suit);
-        self.assertEqual(card.value, 1)
+        self.assertEqual(card.value, 11)
 
     def test_is_ace(self):
         """Test to check card is Ace"""

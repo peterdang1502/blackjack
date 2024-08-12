@@ -1,15 +1,18 @@
+from hand import Hand
+from constants import *
+
 class Player:
     def __init__(self):
-        self.hand = []
-        self.ace = False
-        self.blackjack = False
-        self.hand_value = 0
+        hand = Hand()
+        self.hands = [hand]
+        self.hand_index = 0
 
     def receive_card(self, card):
-        if card.ace:
-            self.ace = True
-        self.hand_value += card.value
-        self.hand.append(card)
-        
+        self.hands[self.hand_index].receive_card(card)
+
+    def is_blackjack(self):
+        return self.hands[self.hand_index].is_blackjack()
+    
     def print_cards(self):
-        print(self.hand)
+        for h in self.hands:
+            h.print_cards()
