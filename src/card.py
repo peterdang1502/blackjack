@@ -15,6 +15,9 @@ class Card:
         else:
             self.value = 10
 
+    def get_value(self):
+        return self.value
+
     def is_ace(self):
         return self.ace
     

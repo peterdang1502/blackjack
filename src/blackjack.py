@@ -6,4 +6,9 @@ if __name__ == '__main__':
     game.deal_cards()
     game.print_cards()
 
-    game.check_blackjacks()
+    game_state = game.check_blackjacks()
+    if game_state != CONTINUE:
+        print(game_state)
+    else:
+        action = game.print_player_prompt()
+

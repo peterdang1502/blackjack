@@ -13,6 +13,9 @@ class Player:
     def is_blackjack(self):
         return self.hands[self.hand_index].is_blackjack()
     
+    def is_split(self):
+        return self.hands[self.hand_index].is_split()
+    
     def print_cards(self):
         for h in self.hands:
             h.print_cards()
