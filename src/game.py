@@ -18,8 +18,8 @@ class Game:
         if self.player.is_split():
             self.split = True
 
-    def deal_card_to_player(self, card):
-        self.player.receive_card(card)
+    def deal_card_to_player(self, card, soft = True):
+        return self.player.receive_card(card, soft)
     
     def deal_card_to_dealer(self, card):
         self.dealer.receive_card(card)
@@ -35,14 +35,34 @@ class Game:
         elif player_blackjack:
             return WON
         else:
-            return CONTINUE
+            return PLAYER_TURN
         
-    def print_player_prompt(self):
-        split = " split," if self.split else ""
-        print("Possible actions: stand, hit, double down," + split + " surrender")
-        print("Player action?")
-        return input()
+    def player_action(self):
+        while self.player.is_alive():
+            self.print_cards()
+            action = self.player.action()
+            if action == STAND:
+                self.player.stand()
+            elif action == HIT:
+                curr_hand_state = self.deal_card_to_player(self.deck.draw_card(), False)
+                if curr_hand_state == BUST:
+                    return BUST
+            elif action == DOUBLE_DOWN:
+                curr_hand_state = self.deal_card_to_player(self.deck.draw_card())
+                if curr_hand_state == BUST:
+                    return BUST
+                else:
+                    self.player.stand()
+            elif action == SPLIT:
+                two_new_cards = [self.deck.draw_card(), self.deck.draw_card()]
+                self.player.split(two_new_cards)
+            else:
+                self.player.surrender()
+
+    def dealer_action(self):
+        action = self.dealer.action()
+        self.print_cards(True)
         
-    def print_cards(self):
-        self.dealer.print_cards()
+    def print_cards(self, reveal = False):
+        self.dealer.print_cards(reveal)
         self.player.print_cards()

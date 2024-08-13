@@ -11,17 +11,17 @@ class TestCard(unittest.TestCase):
         """Test to calculate card value of 2"""
         number = random.choice(NUMBER_CARDS)
         card = Card(number, self.suit);
-        self.assertEqual(card.value, int(number))
+        self.assertEqual(card.get_value(), int(number))
 
     def test_calculate_value_special(self):
         """Test to calculate card value of court cards"""
         card = Card(random.choice(COURT_CARDS), self.suit);
-        self.assertEqual(card.value, 10)
+        self.assertEqual(card.get_value(), 10)
 
     def test_calculate_value_ace(self):
         """Test to calculate card value of Ace"""
         card = Card(self.ace, self.suit);
-        self.assertEqual(card.value, 11)
+        self.assertEqual(card.get_value(), 11)
 
     def test_is_ace(self):
         """Test to check card is Ace"""

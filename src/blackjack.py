@@ -4,11 +4,11 @@ from constants import *
 if __name__ == '__main__':
     game = Game()
     game.deal_cards()
-    game.print_cards()
-
+    
     game_state = game.check_blackjacks()
-    if game_state != CONTINUE:
+    if game_state != PLAYER_TURN:
+        game.print_cards()
         print(game_state)
     else:
-        action = game.print_player_prompt()
-
+        game.player_action()
+        game.dealer_action()

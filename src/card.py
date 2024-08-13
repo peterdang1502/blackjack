@@ -5,18 +5,14 @@ class Card:
         self.rank = rank
         self.suit = suit
         self.ace = rank == CARD_RANKS[-1]
-        self.calculate_value()
 
-    def calculate_value(self):
+    def get_value(self, soft = True):
         if self.rank in CARD_RANKS[:8]:
-            self.value = int(self.rank)
+            return int(self.rank)
         elif self.rank == CARD_RANKS[-1]:
-            self.value = 11
+            return 11 if soft else 1
         else:
-            self.value = 10
-
-    def get_value(self):
-        return self.value
+            return 10
 
     def is_ace(self):
         return self.ace

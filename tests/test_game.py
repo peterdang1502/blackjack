@@ -39,7 +39,7 @@ class TestGame(unittest.TestCase):
         """Test that both dealer and player don't have blackjacks"""
         game = Game()
         self.deal_card_helper(game, self.non_blackjack_hand, self.non_blackjack_hand)
-        self.assertEqual(game.check_blackjacks(), CONTINUE)
+        self.assertEqual(game.check_blackjacks(), PLAYER_TURN)
 
 if __name__ == "__main__":
     unittest.main()
