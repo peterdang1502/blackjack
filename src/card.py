@@ -13,6 +13,9 @@ class Card:
             return 11 if soft else 1
         else:
             return 10
+        
+    def get_rank(self):
+        return self.rank
 
     def is_ace(self):
         return self.ace

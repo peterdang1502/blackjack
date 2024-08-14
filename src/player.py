@@ -3,12 +3,11 @@ from constants import *
 
 class Player:
     def __init__(self):
-        hand = Hand()
-        self.hands = [hand]
+        self.hands = [Hand()]
         self.hand_index = 0
 
-    def receive_card(self, card, soft = True):
-        curr_hand_state = self.hands[self.hand_index].receive_card(card, soft)
+    def receive_card(self, card):
+        curr_hand_state = self.hands[self.hand_index].receive_card(card)
         if curr_hand_state == BUST:
             self.hand_index += 1
             return BUST
@@ -38,13 +37,25 @@ class Player:
         self.hands.append(new_hand)
         curr_index = self.hand_index
         for i in range(2):
+            self.hand_index += i
             self.receive_card(new_cards[i])
-            self.hand_index += 1
         self.hand_index = curr_index
 
     def surrender(self):
         self.hand_index += 1
+
+    def reset_hands(self):
+        discard = []
+        for h in self.hands:
+            discard.extend(h.reset_hand())
+        self.hands = [Hand()]
+        self.hand_index = 0
+        return discard
     
     def print_cards(self):
         for h in self.hands:
             h.print_cards()
+
+    def print_final_hand(self, dealer_value):
+        for h in self.hands:
+            h.print_cards(True, dealer_value)

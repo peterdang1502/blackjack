@@ -1,3 +1,4 @@
+import time
 from deck import Deck
 from player import Player
 from dealer import Dealer
@@ -18,11 +19,15 @@ class Game:
         if self.player.is_split():
             self.split = True
 
-    def deal_card_to_player(self, card, soft = True):
-        return self.player.receive_card(card, soft)
+    def return_discard(self):
+        discard = self.player.reset_hands() + self.dealer.reset_hands()
+        self.deck.return_cards(discard)
+
+    def deal_card_to_player(self, card):
+        return self.player.receive_card(card)
     
     def deal_card_to_dealer(self, card):
-        self.dealer.receive_card(card)
+        return self.dealer.receive_card(card)
 
     def check_blackjacks(self):
         dealer_blackjack = self.dealer.is_blackjack()
@@ -44,7 +49,7 @@ class Game:
             if action == STAND:
                 self.player.stand()
             elif action == HIT:
-                curr_hand_state = self.deal_card_to_player(self.deck.draw_card(), False)
+                curr_hand_state = self.deal_card_to_player(self.deck.draw_card())
                 if curr_hand_state == BUST:
                     return BUST
             elif action == DOUBLE_DOWN:
@@ -58,10 +63,27 @@ class Game:
                 self.player.split(two_new_cards)
             else:
                 self.player.surrender()
+        return ALIVE
 
     def dealer_action(self):
-        action = self.dealer.action()
-        self.print_cards(True)
+        while self.dealer.is_alive():
+            time.sleep(1)
+            action = self.dealer.action()
+            self.print_cards(True)
+            if action == STAND:
+                self.dealer.stand()
+            else:
+                curr_hand_state = self.deal_card_to_dealer(self.deck.draw_card())
+                if curr_hand_state == BUST:
+                    return BUST
+        return ALIVE
+    
+    def compare_hands(self):
+        print("COMPARING HANDS")
+        self.dealer.print_final_hand()
+        dealer_hand_value = self.dealer.get_hand_value()
+        self.player.print_final_hand(dealer_hand_value)
+
         
     def print_cards(self, reveal = False):
         self.dealer.print_cards(reveal)

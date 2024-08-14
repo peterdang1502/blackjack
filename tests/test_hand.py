@@ -6,7 +6,7 @@ from src.constants import *
 
 class TestHand(unittest.TestCase):
     suit = random.choice(CARD_SUITS)
-    number_rank_one = random.choice(NUMBER_CARDS)
+    number_rank_one = random.choice(NUMBER_CARDS[:-1])
     number_rank_two = random.choice(NUMBER_CARDS)
     number_card_one = Card(number_rank_one, suit)
     number_card_two = Card(number_rank_two, suit)
@@ -58,7 +58,7 @@ class TestHand(unittest.TestCase):
         hand.reset_hand()
         self.hand_receive_cards(hand, self.only_aces_hand)
         self.assertFalse(hand.is_blackjack())
-        self.assertEqual(hand.hand_value, 22)
+        self.assertEqual(hand.hand_value, 12)
 
     def test_hand_split(self):
         hand = Hand()
