@@ -1,4 +1,3 @@
-from hand import Hand
 from constants import *
 
 class Player:

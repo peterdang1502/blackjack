@@ -1,5 +1,6 @@
 import unittest
 import random
+from typing import List
 from src.hand import Hand
 from src.card import Card
 from src.constants import *
@@ -24,7 +25,7 @@ class TestHand(unittest.TestCase):
     split_rank = random.choice(CARD_RANKS)
     split_hand = [Card(split_rank, suit), Card(split_rank, suit)]
 
-    def hand_receive_cards(self, hand, cards):
+    def hand_receive_cards(self, hand: Hand, cards: List[Card]):
         for c in cards:
             hand.receive_card(c)
 
@@ -32,43 +33,39 @@ class TestHand(unittest.TestCase):
         """Test that a hand's value is calculated correctly through various hand arrangements"""
         hand = Hand()
         self.hand_receive_cards(hand, self.only_numbers_hand)
-        self.assertFalse(hand.is_blackjack())
+        self.assertFalse(hand.get_can_split())
+        self.assertEqual(hand.get_state(), IN_PLAY)
         self.assertEqual(hand.hand_value, int(self.number_rank_one) + int(self.number_rank_two))
         
-        hand.reset_hand()
+        hand = Hand()
         self.hand_receive_cards(hand, self.number_and_court_hand)
-        self.assertFalse(hand.is_blackjack())
+        self.assertFalse(hand.get_can_split())
+        self.assertEqual(hand.get_state(), IN_PLAY)
         self.assertEqual(hand.hand_value, int(self.number_rank_one) + 10)
 
-        hand.reset_hand()
+        hand = Hand()
         self.hand_receive_cards(hand, self.number_and_ace_hand)
-        self.assertFalse(hand.is_blackjack())
+        self.assertFalse(hand.get_can_split())
+        self.assertEqual(hand.get_state(), IN_PLAY)
         self.assertEqual(hand.hand_value, int(self.number_rank_two) + 11)
 
-        hand.reset_hand()
+        hand = Hand()
         self.hand_receive_cards(hand, self.only_courts_hand)
-        self.assertFalse(hand.is_blackjack())
+        self.assertTrue(hand.get_can_split())
+        self.assertEqual(hand.get_state(), IN_PLAY)
         self.assertEqual(hand.hand_value, 20)
 
-        hand.reset_hand()
+        hand = Hand()
         self.hand_receive_cards(hand, self.court_and_ace_hand)
-        self.assertTrue(hand.is_blackjack())
+        self.assertFalse(hand.get_can_split())
+        self.assertEqual(hand.get_state(), BLACKJACK)
         self.assertEqual(hand.hand_value, 21)
 
-        hand.reset_hand()
-        self.hand_receive_cards(hand, self.only_aces_hand)
-        self.assertFalse(hand.is_blackjack())
-        self.assertEqual(hand.hand_value, 12)
-
-    def test_hand_split(self):
         hand = Hand()
-        self.hand_receive_cards(hand, self.split_hand)
-        self.assertTrue(hand.is_split())
-
-        hand.reset_hand()
-        self.hand_receive_cards(hand, self.number_and_court_hand)
-        self.assertFalse(hand.is_split())
-
+        self.hand_receive_cards(hand, self.only_aces_hand)
+        self.assertTrue(hand.get_can_split())
+        self.assertEqual(hand.get_state(), IN_PLAY)
+        self.assertEqual(hand.hand_value, 12)
 
 if __name__ == "__main__":
     unittest.main()

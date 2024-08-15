@@ -1,4 +1,3 @@
-import time
 from game import Game
 from constants import *
 
