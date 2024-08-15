@@ -68,7 +68,7 @@ class Game:
         hand_states = []
         i = 1
         while i < len(self.hands):
-            hand = self.hands[i]
+            hand: Hand = self.hands[i]
             while hand.get_state() not in [BLACKJACK, BUST, STAND, SURRENDER]:
                 self.print_cards(False)
                 action = self.player.action(hand.get_can_split(), hand.return_num_cards() == 2)
