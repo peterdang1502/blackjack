@@ -6,7 +6,11 @@ class Card:
         self.suit = suit
         self.ace = rank == CARD_RANKS[-1]
 
-    def get_value(self, soft = True):
+    def get_value(self, soft: bool = True) -> int:
+        """
+        Returns the value of a card.
+        The soft parameter only matters if the card is an Ace
+        """
         if self.rank in CARD_RANKS[:8]:
             return int(self.rank)
         elif self.rank == CARD_RANKS[-1]:

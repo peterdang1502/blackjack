@@ -1,75 +1,96 @@
+from typing import List
+from card import Card
 from constants import *
 
 class Hand:
-    def __init__(self, card = None):
-        self.cards = [] if card is None else [card]
-        self.blackjack = False
-        self.split = False
-        self.ace = False
-        self.first_ace = -1
+    def __init__(self):
+        self.cards: List[Card] = []
         self.hand_value = 0
+        self.ace = False
+        self.soft_ace_index = -1
+        self.can_split = False
+        self.state = IN_PLAY
 
     def return_num_cards(self):
         return len(self.cards)
 
-    def receive_card(self, card):
+    def receive_card(self, card: Card) -> None:
         self.cards.append(card)
-        soft = False
-        if card.get_rank() == CARD_RANKS[-1] and self.ace == False:
-            self.first_ace = len(self.cards) - 1
-            soft = True
-            self.ace = True
-        
-        card_value = card.get_value(soft)
-        if self.hand_value + card_value > 21 and self.ace == True:
-            self.hand_value -= self.cards[self.first_ace].get_value(True)
-            self.hand_value += self.cards[self.first_ace].get_value(False)
-        self.hand_value += card_value
 
+        card_value = card.get_value()
+        # if card is an ace and there exists an ace already, the new ace value is automatically hard, otherwise its value stays soft and record its index
+        if card.is_ace():
+            if self.ace:
+                card_value = card.get_value(False)
+            else:
+                self.ace = True
+                self.soft_ace_index = self.cards.index(card)
+
+        self.hand_value += card_value
+        # if new hand value over 21, check if there are any soft aces (including the card just received) and turn it hard
+        if self.hand_value > 21 and self.soft_ace_index != - 1:
+            self.hand_value -= self.cards[self.soft_ace_index].get_value()
+            self.hand_value += self.cards[self.soft_ace_index].get_value(False)
+            self.soft_ace_index = -1
+
+        # check hand status
         if self.hand_value > 21:
-            return BUST
+            self.state = BUST
+            return
+        
         if len(self.cards) == 2:
             if self.hand_value == 21:
-                self.blackjack = True
+                self.state = BLACKJACK
+                return
             if self.cards[0].get_value() == self.cards[1].get_value():
-                self.split = True
+                self.can_split = True
         elif len(self.cards) > 2:
-            self.blackjack = False
-            self.split = False
-            self.ace = False
-            self.first_ace = -1
-        return ALIVE
-    
-    def is_blackjack(self):
-        return self.blackjack
+            self.can_split = False
 
-    def is_split(self):
-        return self.split
+        self.state = IN_PLAY
+
+    def receive_cards(self, cards: List[Card]) -> None:
+        for card in cards:
+            self.receive_card(card)
+
+    def remove_cards(self) -> List[Card]:
+        return self.cards
     
-    def has_ace(self):
-        return self.ace
-    
-    def get_hand_value(self):
+    def get_hand_value(self) -> int:
         return self.hand_value
     
-    def remove_second_card(self):
+    def get_can_split(self) -> bool:
+        return self.can_split
+    
+    def get_state(self) -> str:
+        return self.state
+    
+    def set_state(self, state: str) -> None:
+        self.state = state
+    
+    def stand(self) -> None:
+        self.state = STAND
+
+    def double_down(self, card: Card) -> None:
+        self.receive_card(card)
+        if self.state == IN_PLAY:
+            self.state = STAND
+
+    def split(self) -> Card:
         card = self.cards.pop(1)
+        # when splitting a pair of aces and removing the second one, it's always gonna be hard ace
+        self.hand_value -= card.get_value(False)
         return card
     
-    def reset_hand(self):
-        discard = self.cards
-        self.cards = []
-        self.blackjack = False
-        self.split = False
-        self.ace = False
-        self.first_ace = -1
-        self.hand_value = 0
-        return discard
-    
-    def print_cards(self, with_value = False, dealer_value = 0):
-        print(self.cards)
-        if with_value:
-            print("Hand value: {0}, {1}".format(self.hand_value, WON if self.hand_value > dealer_value else LOST if self.hand_value < dealer_value else PUSH))
+    def surrender(self) -> None:
+        self.state = SURRENDER
 
-    def print_dealer_cards(self):
-        print([" ", self.cards[1]])
+    def is_soft_seventeen(self) -> bool:
+        return len(self.cards) == 2 and self.ace and self.hand_value == 17
+    
+    def print_cards(self, is_dealer: bool = False, reveal: bool = False, hand_index: int = 0):
+        prefix = "Dealer: " if is_dealer else "Player hand {0}: ".format(hand_index)
+        if is_dealer and not reveal:
+            print(prefix + str([" ", self.cards[1]]) + " " + self.state)
+        else:
+            print(prefix + str(self.cards) + " " + self.state)

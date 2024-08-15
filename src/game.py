@@ -1,7 +1,10 @@
 import time
+from typing import List
 from deck import Deck
+from hand import Hand
 from player import Player
 from dealer import Dealer
+from card import Card
 from constants import *
 
 class Game:
@@ -9,15 +12,48 @@ class Game:
         self.deck = Deck()
         self.dealer = Dealer()
         self.player = Player()
-        self.split = False
 
-    def deal_cards(self):
+        # an array of hand, starting with the dealer hand
+        # in case the player splits, more hands get added on
+        self.hands = []
+        self.make_default_hands()
+
+    def make_default_hands(self) -> None:
         for i in range(2):
-            self.deal_card_to_player(self.deck.draw_card())
-            self.deal_card_to_dealer(self.deck.draw_card())
+            self.hands.append(self.make_hand())
 
-        if self.player.is_split():
-            self.split = True
+    def make_hand(self) -> Hand:
+        return Hand()
+
+    def deal_cards(self) -> str:
+        # deal 2 cards each in order of player hands first, then dealer
+        for i in range(2):
+            hand: Hand
+            for hand in reversed(self.hands):
+                hand.receive_card(self.deck.draw_card())
+
+        return self.check_blackjacks()
+
+    def check_blackjacks(self) -> str:
+        dealer_hand: Hand = self.hands[0]
+        dealer_state = dealer_hand.get_state()
+        if dealer_state == BLACKJACK:
+            hand: Hand
+            for hand in self.hands[1:]:
+                if hand.get_state() != BLACKJACK:
+                    hand.set_state(LOST)
+                else:
+                    hand.set_state(PUSH)
+            return DEALER_BLACKJACK
+        else:
+            hand: Hand
+            for hand in self.hands[1:]:
+                if hand.get_state() != BLACKJACK:
+                    return IN_PLAY
+            dealer_hand.set_state(LOST)
+            for hand in self.hands[1:]:
+                hand.set_state(WON)
+            return PLAYER_BLACKJACK
 
     def return_discard(self):
         discard = self.player.reset_hands() + self.dealer.reset_hands()
@@ -28,63 +64,76 @@ class Game:
     
     def deal_card_to_dealer(self, card):
         return self.dealer.receive_card(card)
-
-    def check_blackjacks(self):
-        dealer_blackjack = self.dealer.is_blackjack()
-        player_blackjack = self.player.is_blackjack()
-
-        if dealer_blackjack and player_blackjack:
-            return PUSH
-        elif dealer_blackjack:
-            return LOST
-        elif player_blackjack:
-            return WON
-        else:
-            return PLAYER_TURN
         
-    def player_action(self):
-        while self.player.is_alive():
-            self.print_cards()
-            action = self.player.action()
-            if action == STAND:
-                self.player.stand()
-            elif action == HIT:
-                curr_hand_state = self.deal_card_to_player(self.deck.draw_card())
-                if curr_hand_state == BUST:
-                    return BUST
-            elif action == DOUBLE_DOWN:
-                curr_hand_state = self.deal_card_to_player(self.deck.draw_card())
-                if curr_hand_state == BUST:
-                    return BUST
+    def player_action(self) -> List[str]:
+        hand_states = []
+        i = 1
+        while i < len(self.hands):
+            hand = self.hands[i]
+            while hand.get_state() not in [BLACKJACK, BUST, STAND, SURRENDER]:
+                self.print_cards(False)
+                action = self.player.action(hand.get_can_split(), hand.return_num_cards() == 2)
+                if action == STAND:
+                    hand.stand()
+                elif action == HIT:
+                    hand.receive_card(self.deck.draw_card())
+                elif action == DOUBLE_DOWN:
+                    hand.double_down(self.deck.draw_card())
+                elif action == SPLIT:
+                    new_hand = self.make_hand()
+                    self.hands.append(new_hand)
+                    second_card = hand.split()
+                    hand.receive_card(self.deck.draw_card())
+                    new_hand.receive_cards([second_card, self.deck.draw_card()])
                 else:
-                    self.player.stand()
-            elif action == SPLIT:
-                two_new_cards = [self.deck.draw_card(), self.deck.draw_card()]
-                self.player.split(two_new_cards)
-            else:
-                self.player.surrender()
-        return ALIVE
+                    hand.surrender()
+            hand_states.append(hand.get_state())
+            i += 1
+        return hand_states
 
-    def dealer_action(self):
-        while self.dealer.is_alive():
-            time.sleep(1)
-            action = self.dealer.action()
-            self.print_cards(True)
+    def dealer_action(self) -> str:
+        hand: Hand = self.hands[0]
+        while hand.get_state() not in [BUST, STAND]:
+            action = self.dealer.action(hand.get_hand_value(), hand.is_soft_seventeen())
             if action == STAND:
-                self.dealer.stand()
+                hand.stand()
             else:
-                curr_hand_state = self.deal_card_to_dealer(self.deck.draw_card())
-                if curr_hand_state == BUST:
-                    return BUST
-        return ALIVE
-    
-    def compare_hands(self):
-        print("COMPARING HANDS")
-        self.dealer.print_final_hand()
-        dealer_hand_value = self.dealer.get_hand_value()
-        self.player.print_final_hand(dealer_hand_value)
+                hand.receive_card(self.deck.draw_card())
+            self.print_cards(True)
+            time.sleep(1)
+        return hand.get_state()
 
+    def dealer_bust(self) -> None:
+        hand: Hand
+        for hand in self.hands[1:]:
+            hand.set_state(WON if hand.get_state() in [BLACKJACK, STAND] else LOST)
+        self.print_cards(True)
+
+    def compare_hands(self) -> None:
+        dealer_hand_value = self.hands[0].get_hand_value()
+        hand: Hand
+        for hand in self.hands[1:]:
+            hand_state = hand.get_state()
+            if hand_state in [BUST, SURRENDER]:
+                hand.set_state(LOST)
+            elif hand_state == BLACKJACK:
+                hand.set_state(WON)
+            else:
+                hand_value = hand.get_hand_value()
+                hand.set_state(WON if hand_value > dealer_hand_value else PUSH if hand_value == dealer_hand_value else LOST)
+        self.print_cards(True)
+
+    def return_discard(self) -> None:
+        discard = []
+        hand: Hand
+        for hand in self.hands:
+            discard.extend(hand.remove_cards())
+        self.deck.return_cards(discard)
+        self.hands = []
+        self.make_default_hands()
         
     def print_cards(self, reveal = False):
-        self.dealer.print_cards(reveal)
-        self.player.print_cards()
+        self.hands[0].print_cards(True, reveal)
+        for i in range(1, len(self.hands)):
+            self.hands[i].print_cards(False, False, i)
+

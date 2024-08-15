@@ -10,7 +10,7 @@ class Deck:
     def shuffle(self):
         random.shuffle(self.deck)
 
-    def draw_card(self):
+    def draw_card(self) -> Card:
         return self.deck.pop(0)
     
     def return_cards(self, pile):
