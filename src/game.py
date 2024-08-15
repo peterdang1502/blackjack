@@ -92,23 +92,30 @@ class Game:
 
     def dealer_action(self) -> str:
         hand: Hand = self.hands[0]
+        self.print_cards(True)
         while hand.get_state() not in [BUST, STAND]:
+            time.sleep(1)
             action = self.dealer.action(hand.get_hand_value(), hand.is_soft_seventeen())
             if action == STAND:
                 hand.stand()
             else:
                 hand.receive_card(self.deck.draw_card())
             self.print_cards(True)
-            time.sleep(1)
         return hand.get_state()
+    
+    def player_bust(self) -> None:
+        self.hands[0].set_state(WON)
+        self.print_cards(True)
 
     def dealer_bust(self) -> None:
+        time.sleep(1)
         hand: Hand
         for hand in self.hands[1:]:
             hand.set_state(WON if hand.get_state() in [BLACKJACK, STAND] else LOST)
         self.print_cards(True)
 
     def compare_hands(self) -> None:
+        time.sleep(1)
         dealer_hand_value = self.hands[0].get_hand_value()
         hand: Hand
         for hand in self.hands[1:]:
