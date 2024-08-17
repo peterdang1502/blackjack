@@ -7,11 +7,10 @@ from src.constants import *
 from unittest.mock import patch, PropertyMock, Mock, MagicMock
 
 class TestGame(unittest.TestCase):
-    suit = random.choice(CARD_SUITS)
-    blackjack_hands = [Card(random.choice(COURT_CARDS), suit), Card(random.choice(COURT_CARDS), suit), Card(ACE_RANK, suit), Card(ACE_RANK, suit)]
-    dealer_blackjack_hand = [Card(random.choice(NUMBER_CARDS), suit), Card(random.choice(COURT_CARDS), suit), Card(random.choice(NUMBER_CARDS), suit), Card(ACE_RANK, suit)]
-    player_blackjack_hand = [Card(random.choice(COURT_CARDS), suit), Card(random.choice(NUMBER_CARDS), suit), Card(ACE_RANK, suit), Card(random.choice(NUMBER_CARDS), suit)]
-    non_blackjack_hands = [Card(random.choice(NUMBER_CARDS), suit), Card(random.choice(NUMBER_CARDS), suit), Card(random.choice(NUMBER_CARDS), suit), Card(random.choice(NUMBER_CARDS), suit)]
+    blackjack_hands = [Card(random.choice(COURT_CARDS)), Card(random.choice(COURT_CARDS)), Card(ACE_RANK), Card(ACE_RANK)]
+    dealer_blackjack_hand = [Card(random.choice(NUMBER_CARDS)), Card(random.choice(COURT_CARDS)), Card(random.choice(NUMBER_CARDS)), Card(ACE_RANK)]
+    player_blackjack_hand = [Card(random.choice(COURT_CARDS)), Card(random.choice(NUMBER_CARDS)), Card(ACE_RANK), Card(random.choice(NUMBER_CARDS))]
+    non_blackjack_hands = [Card(random.choice(NUMBER_CARDS)), Card(random.choice(NUMBER_CARDS)), Card(random.choice(NUMBER_CARDS)), Card(random.choice(NUMBER_CARDS))]
 
     def test_both_blackjack(self):
         """Test that both dealer and player have blackjacks"""

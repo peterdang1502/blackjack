@@ -1,7 +1,9 @@
+from __future__ import annotations
+import random
 from constants import *
 
 class Card:
-    def __init__(self, rank, suit):
+    def __init__(self, rank, suit = random.choice(CARD_SUITS)):
         self.rank = rank
         self.suit = suit
         self.ace = rank == CARD_RANKS[-1]
@@ -29,3 +31,6 @@ class Card:
     
     def __repr__(self):
         return "% s of % s" % (self.rank, self.suit)
+    
+    def __eq__(self, other: Card):
+        return self.get_rank() == other.get_rank()

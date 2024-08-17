@@ -6,14 +6,13 @@ from src.card import Card
 from src.constants import *
 
 class TestHand(unittest.TestCase):
-    suit = random.choice(CARD_SUITS)
     number_rank_one = random.choice(NUMBER_CARDS[:-1])
     number_rank_two = random.choice(NUMBER_CARDS)
-    number_card_one = Card(number_rank_one, suit)
-    number_card_two = Card(number_rank_two, suit)
-    court_card_one = Card(random.choice(COURT_CARDS), suit)
-    court_card_two = Card(random.choice(COURT_CARDS), suit)
-    ace_card = Card(CARD_RANKS[-1], suit)
+    number_card_one = Card(number_rank_one)
+    number_card_two = Card(number_rank_two)
+    court_card_one = Card(random.choice(COURT_CARDS))
+    court_card_two = Card(random.choice(COURT_CARDS))
+    ace_card = Card(CARD_RANKS[-1])
 
     only_numbers_hand = [number_card_one, number_card_two]
     number_and_court_hand = [number_card_one, court_card_one]
@@ -23,7 +22,7 @@ class TestHand(unittest.TestCase):
     only_aces_hand = [ace_card, ace_card]
 
     split_rank = random.choice(CARD_RANKS)
-    split_hand = [Card(split_rank, suit), Card(split_rank, suit)]
+    split_hand = [Card(split_rank), Card(split_rank)]
 
     def hand_receive_cards(self, hand: Hand, cards: List[Card]):
         for c in cards:

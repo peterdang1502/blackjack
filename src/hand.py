@@ -1,15 +1,18 @@
+from __future__ import annotations
 from typing import List
 from card import Card
 from constants import *
 
 class Hand:
-    def __init__(self):
+    def __init__(self, cards: List[Card] = []):
         self.cards: List[Card] = []
         self.hand_value = 0
         self.ace = False
         self.soft_ace_index = -1
         self.can_split = False
         self.state = IN_PLAY
+        if len(cards) > 0:
+            self.receive_cards(cards)
 
     def return_num_cards(self):
         return len(self.cards)
@@ -53,11 +56,14 @@ class Hand:
         for card in cards:
             self.receive_card(card)
 
-    def remove_cards(self) -> List[Card]:
+    def get_cards(self) -> List[Card]:
         return self.cards
     
     def get_hand_value(self) -> int:
         return self.hand_value
+    
+    def has_soft_ace(self):
+        return self.soft_ace_index != -1
     
     def get_can_split(self) -> bool:
         return self.can_split
@@ -80,10 +86,11 @@ class Hand:
         card = self.cards.pop(1)
         # when splitting a pair of aces and removing the second one, it's always gonna be hard ace
         self.hand_value -= card.get_value(False)
+        self.can_split = False
         return card
     
     def surrender(self) -> None:
-        self.state = SURRENDER
+        self.state = LOST
 
     def is_soft_seventeen(self) -> bool:
         return len(self.cards) == 2 and self.ace and self.hand_value == 17
@@ -94,3 +101,17 @@ class Hand:
             print(prefix + str([" ", self.cards[1]]) + " " + self.state)
         else:
             print(prefix + str(self.cards) + " " + self.state)
+
+    def __str__(self):
+        return str(self.cards)
+    
+    def __repr__(self):
+        return str(self.cards)
+    
+    def __eq__(self, other: Hand):
+        other_cards = other.get_cards()
+        same = True
+        for i in range(len(self.cards)):
+            if self.cards[i] != other_cards[i]:
+                same = False
+        return same

@@ -19,10 +19,7 @@ class Game:
 
     def make_default_hands(self) -> None:
         for i in range(2):
-            self.hands.append(self.make_hand())
-
-    def make_hand(self) -> Hand:
-        return Hand()
+            self.hands.append(Hand())
 
     def deal_cards(self) -> str:
         # deal 2 cards each in order of player hands first, then dealer
@@ -53,41 +50,51 @@ class Game:
             for hand in self.hands[1:]:
                 hand.set_state(WON)
             return PLAYER_BLACKJACK
-
-    def return_discard(self):
-        discard = self.player.reset_hands() + self.dealer.reset_hands()
-        self.deck.return_cards(discard)
-
-    def deal_card_to_player(self, card):
-        return self.player.receive_card(card)
-    
-    def deal_card_to_dealer(self, card):
-        return self.dealer.receive_card(card)
         
-    def player_action(self) -> List[str]:
+    def player_action(self, action = "") -> List[str]:
         hand_states = []
-        i = 1
-        while i < len(self.hands):
-            hand: Hand = self.hands[i]
-            while hand.get_state() not in [BLACKJACK, BUST, STAND, SURRENDER]:
-                self.print_cards(False)
-                action = self.player.action(hand.get_can_split(), hand.return_num_cards() == 2)
-                if action == STAND:
-                    hand.stand()
-                elif action == HIT:
-                    hand.receive_card(self.deck.draw_card())
-                elif action == DOUBLE_DOWN:
-                    hand.double_down(self.deck.draw_card())
-                elif action == SPLIT:
-                    new_hand = self.make_hand()
-                    self.hands.append(new_hand)
-                    second_card = hand.split()
-                    hand.receive_card(self.deck.draw_card())
-                    new_hand.receive_cards([second_card, self.deck.draw_card()])
-                else:
-                    hand.surrender()
-            hand_states.append(hand.get_state())
-            i += 1
+
+        # this first if part is for the machine learning only
+        if action != "":
+            hand: Hand = self.hands[1]
+            if action == STAND:
+                hand.stand()
+            elif action == HIT:
+                hand.receive_card(self.deck.draw_card())
+            elif action == DOUBLE_DOWN:
+                hand.double_down(self.deck.draw_card())
+            elif action == SPLIT:
+                new_hand = Hand()
+                self.hands.append(new_hand)
+                second_card = hand.split()
+                hand.receive_card(self.deck.draw_card())
+                new_hand.receive_cards([second_card, self.deck.draw_card()])
+            else:
+                hand.surrender()
+        # this second part is for player gameplay
+        else:
+            i = 1
+            while i < len(self.hands):
+                hand: Hand = self.hands[i]
+                while hand.get_state() not in [BLACKJACK, BUST, STAND, LOST]:
+                    action = self.player.action(hand.get_can_split(), hand.return_num_cards() == 2)
+                    if action == STAND:
+                        hand.stand()
+                    elif action == HIT:
+                        hand.receive_card(self.deck.draw_card())
+                    elif action == DOUBLE_DOWN:
+                        hand.double_down(self.deck.draw_card())
+                    elif action == SPLIT:
+                        new_hand = Hand()
+                        self.hands.append(new_hand)
+                        second_card = hand.split()
+                        hand.receive_card(self.deck.draw_card())
+                        new_hand.receive_cards([second_card, self.deck.draw_card()])
+                    else:
+                        hand.surrender()
+                i += 1
+                        
+        hand_states.append(hand.get_state())
         return hand_states
 
     def dealer_action(self) -> str:
@@ -133,7 +140,7 @@ class Game:
         discard = []
         hand: Hand
         for hand in self.hands:
-            discard.extend(hand.remove_cards())
+            discard.extend(hand.get_cards())
         self.deck.return_cards(discard)
         self.hands = []
         self.make_default_hands()
@@ -143,3 +150,6 @@ class Game:
         for i in range(1, len(self.hands)):
             self.hands[i].print_cards(False, False, i)
 
+    # for ml
+    def get_player_hand(self, index) -> Hand:
+        return self.hands[index]
