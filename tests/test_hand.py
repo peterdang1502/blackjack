@@ -66,5 +66,8 @@ class TestHand(unittest.TestCase):
         self.assertEqual(hand.get_state(), IN_PLAY)
         self.assertEqual(hand.hand_value, 12)
 
+        hand.receive_card(Card(ACE_RANK))
+        self.assertEqual(hand.hand_value, 13)
+
 if __name__ == "__main__":
     unittest.main()

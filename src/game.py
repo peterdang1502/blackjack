@@ -53,10 +53,10 @@ class Game:
         
     def player_action(self, action = "") -> List[str]:
         hand_states = []
+        hand: Hand = self.hands[1]
 
         # this first if part is for the machine learning only
         if action != "":
-            hand: Hand = self.hands[1]
             if action == STAND:
                 hand.stand()
             elif action == HIT:
@@ -64,11 +64,12 @@ class Game:
             elif action == DOUBLE_DOWN:
                 hand.double_down(self.deck.draw_card())
             elif action == SPLIT:
-                new_hand = Hand()
-                self.hands.append(new_hand)
+                # new_hand = Hand()
+                # self.hands.append(new_hand)
                 second_card = hand.split()
+                self.deck.return_cards([second_card])
                 hand.receive_card(self.deck.draw_card())
-                new_hand.receive_cards([second_card, self.deck.draw_card()])
+                # new_hand.receive_cards([second_card, self.deck.draw_card()])
             else:
                 hand.surrender()
         # this second part is for player gameplay

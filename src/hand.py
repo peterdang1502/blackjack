@@ -28,7 +28,7 @@ class Hand:
             else:
                 self.ace = True
                 self.soft_ace_index = self.cards.index(card)
-
+            
         self.hand_value += card_value
         # if new hand value over 21, check if there are any soft aces (including the card just received) and turn it hard
         if self.hand_value > 21 and self.soft_ace_index != - 1:
@@ -107,11 +107,3 @@ class Hand:
     
     def __repr__(self):
         return str(self.cards)
-    
-    def __eq__(self, other: Hand):
-        other_cards = other.get_cards()
-        same = True
-        for i in range(len(self.cards)):
-            if self.cards[i] != other_cards[i]:
-                same = False
-        return same

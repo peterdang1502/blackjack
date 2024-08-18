@@ -54,10 +54,10 @@ actions = [STAND, HIT, DOUBLE_DOWN, SPLIT]
 
 q_table = np.zeros((len(states), len(actions)))
 
-learning_rate = 0.8
-discount_factor = 0.95
-exploration_prob = 0.2
-epochs = 10000
+learning_rate = 1
+discount_factor = 1
+exploration_prob = 0.1
+epochs = 10000000
 
 game = Game()
 for epoch in range(epochs):
@@ -69,23 +69,23 @@ for epoch in range(epochs):
     dealer_hand = game.get_player_hand(0)
     player_hand = game.get_player_hand(1)
 
-    possible_actions = actions[:]
-    if not player_hand.get_can_split():
-        possible_actions.remove(SPLIT)
-    if player_hand.return_num_cards() > 2:
-        possible_actions.remove(DOUBLE_DOWN)
-
     curr_state_index = get_state_index(dealer_hand, player_hand)
     curr_state = states[curr_state_index]
     
     while curr_state != goal_state and curr_state != bust_state:
-        if np.random.rand() < exploration_prob:
+        possible_actions = actions[:]
+        if not player_hand.get_can_split():
+            possible_actions.remove(SPLIT)
+        if player_hand.return_num_cards() > 2:
+            possible_actions.remove(DOUBLE_DOWN)
+
+        if np.amax(q_table[curr_state_index]) == 0 or np.random.rand() < exploration_prob:
             action_index = np.random.randint(0, len(possible_actions))
         else:
-            action_index = np.argmax(q_table[curr_state_index])
-
+            action_index = np.argmax(q_table[curr_state_index][0:len(possible_actions)])
+        
         action = actions[action_index]
-
+            
         game.player_action(action)
 
         next_state_index = get_state_index(game.get_player_hand(0), game.get_player_hand(1))
@@ -107,6 +107,7 @@ for epoch in range(epochs):
         curr_state = next_state
 
     game.return_discard()
+    learning_rate = 1 / (1 + 0.1 * epoch)
 
 for i in range(len(states)):
     best = np.argmax(q_table[i])

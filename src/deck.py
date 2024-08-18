@@ -1,4 +1,5 @@
 import random
+from typing import List
 from constants import *
 from card import Card
 
@@ -13,6 +14,6 @@ class Deck:
     def draw_card(self) -> Card:
         return self.deck.pop(0)
     
-    def return_cards(self, pile):
+    def return_cards(self, pile: List[Card]):
         self.deck.extend(pile)
         self.shuffle()
