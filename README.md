@@ -2,9 +2,10 @@ In May 2023, I embarked on a cruise to Alaska. The sights were amazing, but the 
 
 Obviously trying to find an optimal strategy for Blackjack now is just reinventing the wheel. That is not the purpose of this project. This is just me, teaching myself again some Object Oriented Programming, while also teaching myself Machine Learning. More specifically, this project contains a playable 1-player blackjack game on the command line (very unfleshed out), as well as using this blackjack game as a foundation to use Q-learning (reinforcement learning) to attempt to teach my program to come up with optimal strategies. Ideally afterwards, I use the strategies it learned to play some simulation games and end up with a win rate, which eventually and ideally I would like to increase with each revision of my Q-learning code. I documented below my process, as well as the troubles I ran into while doing this:
 
+
 For Q-learning, there are states and actions. There is a starting state, an action that moves you to a new state, and a goal state that you want to reach. Each state-action pair is assigned a Q-value, which is basically a value representing how much you want to perform that action in that state. This Q-value is determined by a couple factors: learning rate (how much a new Q-value will override an old one), reward (how good is the next move basically), and discount factor (importance of future rewards). Q-values for each state-action pair is reevaluated whenever at that state, that action is performed. I will attach a formula somehow
 
-First, my state consists of three cards, and the states are every possible combination of:
+First, my state consists of three cards, and the states are every possible combination of: \
     - The player cards (every possible combination of two cards)
     - The face up dealer card
 This is because as a player, this is the only information you are given when the hands are dealt.
