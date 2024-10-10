@@ -3,22 +3,24 @@ from constants import *
 
 if __name__ == '__main__':
     game = Game()
-    cont = True
-    while cont:
-        game_state = game.deal_cards()
+    while True:
+        game.deal_cards()
+        game_state = game.get_state()
         if game_state == DEALER_BLACKJACK or game_state == PLAYER_BLACKJACK:
             game.print_cards(True)
         else:
-            player_hand_states = game.player_action()
-            if player_hand_states and player_hand_states.count(BUST) == len(player_hand_states):
+            game.player_action()
+            game_state = game.get_state()
+            if game_state == PLAYER_BUSTED:
                 game.player_bust()
             else:
-                dealer_hand_state = game.dealer_action()
-                if dealer_hand_state == BUST:
+                game.dealer_action()
+                print("\n")
+                game_state = game.get_state()
+                if game_state == DEALER_BUSTED:
                     game.dealer_bust()
                 else:
                     game.compare_hands()
         
         game.return_discard()
-        again = input("again?")
-        cont = again == "y"
+        print("\n")
