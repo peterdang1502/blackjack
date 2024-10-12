@@ -30,8 +30,15 @@ After implementing my states, they do not work. Since HIT and DOUBLE DOWN adds a
         - Goal state (hand value of 21)\
         - Bust state (any hand value over 21)
 
+The new states do work, and I've implemented the program to play games, using the charts I've produced to play the optimal decision for every hand it gets, or if there is no optimal decision, it picks a random one.\
+Currently, it produces a win-rate (exclusing player and/or dealer blackjacks) of ~30-40%. There are two paths we can take for our learning model right now:\
+    - Continue finetuning the learning rate, discount factor, and exploration probability to get a better winning rate
+    - Change the learning model. Instead of playing a million random hands, for each hand and dealer upcard, play a million times using different random actions and compile the result to get the optimal decision.
+
+Either way, I need to really optimize the learning process because for 1 million epochs, it takes ~30 minutes to run.
+
 Minor problem:\
-    - If the action chosen is stand, I need to end the learning episode because if a player stands, that's their final hand value\
+    - If the action chosen is stand, I need to end the learning episode because if a player stands, that's their final hand value  (SOLVED) \
     - Janky solution: if you stand, imma move you to the goal state but I won't reevaluate your rewards with the goal state in mind, which should end the learning episode
 
 Current problems:\
